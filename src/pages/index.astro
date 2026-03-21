@@ -1,0 +1,42 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h2>Hi, I'm Rahul 👋</h2>
+			<h3>Chemical Engineer turned Machine Learning Professional</h3>			
+			<p>
+			With a strong foundation in process systems and data-driven science, my journey began after graduating as a bronze medallist from NIT Surat. I started my career at BASF in manufacturing, leading production operations in polymeric dispersions and surfactant plants. 
+			</p>
+
+			<p>
+			Driven by a passion for innovation, I pursued a Ph.D. in Chemical Engineering at IIT Bombay. My research focused on physics-augmented machine learning for process design, optimization, and control. My thesis on physics-augmented learning earned , receiving the prestigious Prime Minister’s Research Fellowship and the KC Khilar PhD Excellence Award (2024-25).
+
+			Currently, I work as a Machine Learning Engineer at Pfizer, contributing to R&D projects across small and large molecule divisions. My work spans hybrid ML, predictive AI, state estimation, and process control, with applications in chemical kinetics modelling, DEM simulation acceleration, and cell culture optimization. 
+			</p>
+
+			<p>
+			I am passionate about leveraging AI at the intersection of chemical engineering and data science to drive innovation in chemical, energy, pharmaceuticals, and advanced manufacturing.
+			</p>
+			
+			<p>
+			Want to see how I combine web technologies with machine learning? 
+			<br>
+			<a href="/neural-network" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #585c60; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+				Try my Interactive Neural Network Sandbox →
+			</a>
+			</p>
+		</main>
+		<Footer />
+	</body>
+</html>

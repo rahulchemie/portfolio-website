@@ -1,0 +1,375 @@
+---
+// src/pages/neural-network.astro
+// A purely client-side interactive neural network visualizer with architecture diagram
+---
+
+<html lang="en">
+<head>
+  <title>Neural Network Visualizer</title>
+  <style>
+    body { 
+      font-family: system-ui, -apple-system, sans-serif; 
+      background: #121212; 
+      color: #e0e0e0; 
+      margin: 0; 
+      padding: 40px 20px; 
+    }
+    .header {
+      max-width: 1200px;
+      margin: 0 auto 30px auto;
+      text-align: center;
+    }
+    h1 { color: #ffffff; }
+    .container { 
+      display: flex; 
+      gap: 30px; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      flex-wrap: wrap; 
+    }
+    .controls { 
+      flex: 1; 
+      min-width: 320px; 
+      background: #1e1e2f; 
+      padding: 25px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .visualization-container { 
+      flex: 2; 
+      min-width: 400px; 
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .panel {
+      background: #1e1e2f; 
+      padding: 25px; 
+      border-radius: 16px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    canvas { 
+      background: #2a2a40; 
+      border-radius: 8px; 
+      width: 100%; 
+      max-width: 700px; 
+      border: 1px solid #3a3a50;
+    }
+    .control-group { 
+      margin-bottom: 20px; 
+      padding: 15px; 
+      border-radius: 8px; 
+    }
+    .n1-group { background: rgba(50, 150, 255, 0.05); border-left: 4px solid #3296ff; }
+    .n2-group { background: rgba(255, 150, 50, 0.05); border-left: 4px solid #ff9632; }
+    .out-group { background: rgba(50, 255, 100, 0.05); border-left: 4px solid #32ff64; }
+    
+    h3 { margin-top: 0; font-size: 1.1rem; }
+    .n1-title { color: #3296ff; }
+    .n2-title { color: #ff9632; }
+    .out-title { color: #32ff64; }
+
+    label { 
+      display: flex; 
+      justify-content: space-between; 
+      margin-bottom: 8px; 
+      font-size: 14px; 
+      font-weight: 500;
+    }
+    input[type="range"] { 
+      width: 100%; 
+      cursor: pointer; 
+      margin-bottom: 12px;
+      accent-color: #ffffff;
+    }
+    select { 
+      width: 100%; 
+      padding: 10px; 
+      margin-bottom: 20px; 
+      background: #2a2a40; 
+      color: white; 
+      border: 1px solid #4a4a60; 
+      border-radius: 6px; 
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .legend {
+      margin-top: 20px; 
+      text-align: center; 
+      font-family: monospace; 
+      font-size: 14px;
+      background: #2a2a40;
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+    <h1>Neural Network Sandbox</h1>
+    <p>Understand the forward pass. Adjust the weights and biases to see how the two hidden neurons combine to form the final output curve.</p>
+    
+    <p style="color: #aaa; font-size: 0.95rem;">
+      <em>The input <strong>X</strong> is varied from -5 to +5. The graph visualizes the resulting output <strong>Y</strong> subject to your chosen model parameters.</em>
+    </p>
+
+    <p style="color: #6a6a80; font-size: 0.85rem; margin-top: 15px;">
+      Built with the help of Gemini 3.1 Pro
+    </p>
+  </div>
+
+  <div class="container">
+    <div class="controls">
+      <label for="activation">Activation Function:</label>
+      <select id="activation">
+        <option value="relu">ReLU (Rectified Linear Unit)</option>
+        <option value="tanh">Tanh (Hyperbolic Tangent)</option>
+        <option value="sigmoid">Sigmoid</option>
+        <option value="linear">Linear (No Activation)</option>
+      </select>
+
+      <div class="control-group n1-group">
+        <h3 class="n1-title">Neuron 1</h3>
+        <label>Input Weight (w1): <span id="val-w1">1.0</span></label>
+        <input type="range" id="w1" min="-5" max="5" step="0.1" value="1">
+        
+        <label>Bias (b1): <span id="val-b1">0.0</span></label>
+        <input type="range" id="b1" min="-5" max="5" step="0.1" value="0">
+        
+        <label>Output Weight (w3): <span id="val-w3">1.0</span></label>
+        <input type="range" id="w3" min="-5" max="5" step="0.1" value="1">
+      </div>
+
+      <div class="control-group n2-group">
+        <h3 class="n2-title">Neuron 2</h3>
+        <label>Input Weight (w2): <span id="val-w2">-1.0</span></label>
+        <input type="range" id="w2" min="-5" max="5" step="0.1" value="-1">
+        
+        <label>Bias (b2): <span id="val-b2">0.0</span></label>
+        <input type="range" id="b2" min="-5" max="5" step="0.1" value="0">
+        
+        <label>Output Weight (w4): <span id="val-w4">1.0</span></label>
+        <input type="range" id="w4" min="-5" max="5" step="0.1" value="1">
+      </div>
+
+      <div class="control-group out-group">
+        <h3 class="out-title">Final Output Layer</h3>
+        <label>Final Bias (b_out): <span id="val-bout">0.0</span></label>
+        <input type="range" id="bout" min="-5" max="5" step="0.1" value="0">
+      </div>
+    </div>
+
+    <div class="visualization-container">
+      
+      <div class="panel">
+        <h3 style="margin-bottom: 15px; color: #aaa;">Network Architecture</h3>
+        <canvas id="diagramCanvas" width="700" height="280"></canvas>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom: 15px; color: #aaa;">Output Function Space</h3>
+        <canvas id="nnCanvas" width="700" height="400"></canvas>
+        <div class="legend">
+          <span style="color: #3296ff;">- - - N1 Contribution</span> &nbsp;&nbsp;|&nbsp;&nbsp;
+          <span style="color: #ff9632;">- - - N2 Contribution</span> &nbsp;&nbsp;|&nbsp;&nbsp;
+          <span style="color: #32ff64; font-weight: bold;"> Final Output (Y)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // 1. Setup Canvas Contexts
+    const chartCanvas = document.getElementById('nnCanvas');
+    const ctx = chartCanvas.getContext('2d');
+    
+    const diagramCanvas = document.getElementById('diagramCanvas');
+    const dCtx = diagramCanvas.getContext('2d');
+
+    // 2. State Management for Inputs
+    const inputs = ['w1', 'b1', 'w3', 'w2', 'b2', 'w4', 'bout'];
+    const params = {};
+
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      const valEl = document.getElementById(`val-${id.replace('_', '')}`);
+      
+      params[id] = parseFloat(el.value);
+
+      el.addEventListener('input', (e) => {
+        params[id] = parseFloat(e.target.value);
+        valEl.innerText = params[id].toFixed(1);
+        draw(); 
+      });
+    });
+
+    const actSelect = document.getElementById('activation');
+    actSelect.addEventListener('change', draw);
+
+    const activations = {
+      relu: (x) => Math.max(0, x),
+      tanh: (x) => Math.tanh(x),
+      sigmoid: (x) => 1 / (1 + Math.exp(-x)),
+      linear: (x) => x
+    };
+
+    const width = chartCanvas.width;
+    const height = chartCanvas.height;
+    const scaleX = width / 10; 
+    const scaleY = height / 10; 
+    const offsetX = width / 2;
+    const offsetY = height / 2;
+
+    function mapX(x) { return offsetX + x * scaleX; }
+    function mapY(y) { return offsetY - y * scaleY; }
+
+    // --- NEW: DRAW DIAGRAM LOGIC ---
+    function drawDiagram() {
+      dCtx.clearRect(0, 0, diagramCanvas.width, diagramCanvas.height);
+      
+      // Node Coordinates
+      const nodes = {
+        in: { x: 100, y: 140 },
+        n1: { x: 350, y: 70 },
+        n2: { x: 350, y: 210 },
+        out: { x: 600, y: 140 }
+      };
+
+      // Helper to draw lines with weight text
+      function drawConnection(start, end, weight, color) {
+        dCtx.beginPath();
+        dCtx.moveTo(start.x, start.y);
+        dCtx.lineTo(end.x, end.y);
+        dCtx.strokeStyle = color;
+        dCtx.lineWidth = Math.abs(weight) * 1.5 + 1; // Line thickness changes with weight!
+        dCtx.globalAlpha = 0.6;
+        dCtx.stroke();
+        dCtx.globalAlpha = 1.0;
+
+        // Draw Weight Text at midpoint
+        const midX = (start.x + end.x) / 2;
+        const midY = (start.y + end.y) / 2;
+        
+        dCtx.fillStyle = '#2a2a40'; // Background box for text readability
+        dCtx.fillRect(midX - 20, midY - 12, 40, 24);
+        
+        dCtx.fillStyle = color;
+        dCtx.font = "bold 14px monospace";
+        dCtx.textAlign = "center";
+        dCtx.textBaseline = "middle";
+        dCtx.fillText(`w:${weight.toFixed(1)}`, midX, midY);
+      }
+
+      // Draw Connections
+      drawConnection(nodes.in, nodes.n1, params.w1, '#3296ff'); // Input -> N1
+      drawConnection(nodes.in, nodes.n2, params.w2, '#ff9632'); // Input -> N2
+      drawConnection(nodes.n1, nodes.out, params.w3, '#3296ff'); // N1 -> Out
+      drawConnection(nodes.n2, nodes.out, params.w4, '#ff9632'); // N2 -> Out
+
+      // Helper to draw nodes with bias text
+      function drawNode(pos, label, color, bias, biasOffset) {
+        // Draw Circle
+        dCtx.beginPath();
+        dCtx.arc(pos.x, pos.y, 25, 0, Math.PI * 2);
+        dCtx.fillStyle = '#1e1e2f';
+        dCtx.fill();
+        dCtx.strokeStyle = color;
+        dCtx.lineWidth = 3;
+        dCtx.stroke();
+
+        // Node Label
+        dCtx.fillStyle = '#ffffff';
+        dCtx.font = "16px sans-serif";
+        dCtx.fillText(label, pos.x, pos.y);
+
+        // Bias Text
+        if (bias !== null) {
+          dCtx.fillStyle = color;
+          dCtx.font = "bold 14px monospace";
+          dCtx.fillText(`b:${bias.toFixed(1)}`, pos.x, pos.y + biasOffset);
+        }
+      }
+
+      // Draw Nodes
+      drawNode(nodes.in, "X", "#ffffff", null, 0);
+      drawNode(nodes.n1, "N1", "#3296ff", params.b1, -40); // Bias above N1
+      drawNode(nodes.n2, "N2", "#ff9632", params.b2, 45);  // Bias below N2
+      drawNode(nodes.out, "Y", "#32ff64", params.bout, -40); // Bias above Out
+    }
+
+    // --- ORIGINAL: DRAW CHART LOGIC ---
+    function drawLines() {
+      ctx.clearRect(0, 0, width, height);
+
+      ctx.strokeStyle = '#3a3a50';
+      ctx.lineWidth = 1;
+      for(let i = -5; i <= 5; i++) {
+        ctx.beginPath(); ctx.moveTo(mapX(i), 0); ctx.lineTo(mapX(i), height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, mapY(i)); ctx.lineTo(width, mapY(i)); ctx.stroke();
+      }
+      
+      ctx.strokeStyle = '#6a6a80';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(mapX(0), 0); ctx.lineTo(mapX(0), height); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, mapY(0)); ctx.lineTo(width, mapY(0)); ctx.stroke();
+
+      const actFn = activations[actSelect.value];
+      ctx.lineJoin = 'round';
+
+      const pathN1 = new Path2D();
+      const pathN2 = new Path2D();
+      const pathY = new Path2D();
+
+      for (let px = 0; px <= width; px += 2) {
+        const x = (px - offsetX) / scaleX;
+
+        const n1_raw = (x * params.w1) + params.b1;
+        const n1_activated = actFn(n1_raw);
+        const n1_contribution = n1_activated * params.w3;
+
+        const n2_raw = (x * params.w2) + params.b2;
+        const n2_activated = actFn(n2_raw);
+        const n2_contribution = n2_activated * params.w4;
+
+        const y_final = n1_contribution + n2_contribution + params.bout;
+
+        if (px === 0) {
+          pathN1.moveTo(mapX(x), mapY(n1_contribution));
+          pathN2.moveTo(mapX(x), mapY(n2_contribution));
+          pathY.moveTo(mapX(x), mapY(y_final));
+        } else {
+          pathN1.lineTo(mapX(x), mapY(n1_contribution));
+          pathN2.lineTo(mapX(x), mapY(n2_contribution));
+          pathY.lineTo(mapX(x), mapY(y_final));
+        }
+      }
+
+      ctx.strokeStyle = '#3296ff';
+      ctx.setLineDash([8, 8]);
+      ctx.lineWidth = 2;
+      ctx.stroke(pathN1);
+
+      ctx.strokeStyle = '#ff9632';
+      ctx.stroke(pathN2);
+
+      ctx.setLineDash([]); 
+      ctx.strokeStyle = '#32ff64';
+      ctx.lineWidth = 4;
+      ctx.stroke(pathY);
+    }
+
+    function draw() {
+      requestAnimationFrame(() => {
+        drawDiagram(); // Update the top diagram
+        drawLines();   // Update the bottom chart
+      });
+    }
+
+    draw();
+  </script>
+</body>
+</html>

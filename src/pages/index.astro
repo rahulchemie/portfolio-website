@@ -9,6 +9,131 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			/* ── FinFlow Banner ── */
+			.finflow-banner {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1.5rem;
+				background: linear-gradient(135deg, #0c1e2c 0%, #111118 60%, #0a1a12 100%);
+				border: 1px solid rgba(99, 102, 241, 0.2);
+				border-radius: 16px;
+				padding: 2rem 2.5rem;
+				margin-top: 2.5rem;
+				position: relative;
+				overflow: hidden;
+			}
+			.finflow-banner::before {
+				content: '';
+				position: absolute;
+				top: -60px;
+				right: -60px;
+				width: 220px;
+				height: 220px;
+				border-radius: 50%;
+				background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
+				pointer-events: none;
+			}
+			.finflow-banner::after {
+				content: '';
+				position: absolute;
+				bottom: -40px;
+				left: 30%;
+				width: 160px;
+				height: 160px;
+				border-radius: 50%;
+				background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+				pointer-events: none;
+			}
+			.finflow-left {
+				display: flex;
+				flex-direction: column;
+				gap: 0.6rem;
+				position: relative;
+				z-index: 1;
+			}
+			.finflow-title {
+				font-size: 1.4rem;
+				font-weight: 700;
+				color: #ffffff;
+				margin: 0;
+				line-height: 1.2;
+				letter-spacing: -0.3px;
+			}
+			.finflow-title span {
+				color: #86efac;
+			}
+			.finflow-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				background: rgba(16,185,129,0.1);
+				border: 1px solid rgba(16,185,129,0.25);
+				color: #6ee7b7;
+				font-size: 11px;
+				font-weight: 600;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				padding: 4px 10px;
+				border-radius: 20px;
+				width: fit-content;
+			}
+			.finflow-desc {
+				font-size: 0.875rem;
+				color: rgba(255,255,255,0.45);
+				margin: 0;
+				max-width: 480px;
+				line-height: 1.6;
+			}
+			.finflow-pills {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin-top: 0.25rem;
+			}
+			.finflow-pill {
+				font-size: 11.5px;
+				color: rgba(255,255,255,0.5);
+				background: rgba(255,255,255,0.05);
+				border: 1px solid rgba(255,255,255,0.08);
+				border-radius: 6px;
+				padding: 3px 10px;
+			}
+			.finflow-cta {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+				color: #ffffff;
+				font-size: 14px;
+				font-weight: 600;
+				padding: 12px 24px;
+				border-radius: 10px;
+				text-decoration: none;
+				white-space: nowrap;
+				position: relative;
+				z-index: 1;
+				box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+				transition: opacity 0.2s, transform 0.15s;
+				flex-shrink: 0;
+			}
+			.finflow-cta:hover {
+				opacity: 0.92;
+				transform: translateY(-2px);
+			}
+			@media (max-width: 720px) {
+				.finflow-banner {
+					flex-direction: column;
+					align-items: flex-start;
+					padding: 1.5rem;
+				}
+				.finflow-cta {
+					width: 100%;
+					justify-content: center;
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
@@ -20,7 +145,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 			</p>
 
 			<p>
-			Driven by a passion for innovation, I pursued a Ph.D. in Chemical Engineering at IIT Bombay. My research focused on physics-augmented machine learning for process design, optimization, and control. My thesis on physics-augmented learning earned , receiving the prestigious Prime Minister’s Research Fellowship and the KC Khilar PhD Excellence Award (2024-25).
+			Driven by a passion for innovation, I pursued a Ph.D. in Chemical Engineering at IIT Bombay. My research focused on physics-augmented machine learning for process design, optimization, and control. My thesis on physics-augmented learning earned , receiving the prestigious Prime Minister's Research Fellowship and the KC Khilar PhD Excellence Award (2024-25).
 
 			Currently, I work as a Machine Learning Engineer at Pfizer, contributing to R&D projects across small and large molecule divisions. My work spans hybrid ML, predictive AI, state estimation, and process control, with applications in chemical kinetics modelling, DEM simulation acceleration, and cell culture optimization. 
 			</p>
@@ -36,6 +161,26 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				Try my Interactive Neural Network Sandbox →
 			</a>
 			</p>
+
+			<!-- FinFlow Banner -->
+			<div class="finflow-banner">
+				<div class="finflow-left">
+					<div class="finflow-badge">💰 New App</div>
+					<h2 class="finflow-title">Track your money with <span>FinFlow</span></h2>
+					<p class="finflow-desc">
+						A personal finance tracker built for India — burn-rate charts, 50/30/20 budget pacing, SIP projections, and paise-precise expense tracking.
+					</p>
+					<div class="finflow-pills">
+						<span class="finflow-pill">📊 Analytics</span>
+						<span class="finflow-pill">📈 Investments</span>
+						<span class="finflow-pill">⚡ Budget Pacing</span>
+						<span class="finflow-pill">🔐 Secure</span>
+					</div>
+				</div>
+				<a href="/expense-tracker/" class="finflow-cta">
+					Try FinFlow →
+				</a>
+			</div>
 		</main>
 		<Footer />
 	</body>

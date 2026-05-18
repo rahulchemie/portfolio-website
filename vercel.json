@@ -5,6 +5,10 @@
       "destination": "https://expense-tracker-rahul25.vercel.app/"
     },
     {
+      "source": "/expense-tracker/",
+      "destination": "https://expense-tracker-rahul25.vercel.app/"
+    },
+    {
       "source": "/expense-tracker/:match*",
       "destination": "https://expense-tracker-rahul25.vercel.app/:match*"
     }
